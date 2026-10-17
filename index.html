@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-автоматизация для бизнеса — презентация Promptly</title>
+<meta name="description" content="Презентация о том, как AI снимает рутину с владельца малого бизнеса. Пример работы Promptly.">
+<meta property="og:title" content="Ваш бизнес может работать, пока вы спите">
+<meta property="og:description" content="Презентация об AI-автоматизации для малого бизнеса. Пример работы Promptly.">
+<meta property="og:image" content="https://promtly-ru.github.io/ai-presentation/img/preview-cover.jpg">
+<meta name="theme-color" content="#0E1220">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&family=Unbounded:wght@400..800&display=swap">
+<style>
+:root {
+  --bg: #0E1220; --bg2: #151A2C; --card: #1B2140; --line: #2C3360; --line2: #262C45;
+  --fg: #F4F1EA; --muted: #AEB4CC; --dim: #8A90A8;
+  --a1: #8B97FF; --a2: #FFB86B; --teal: #4BC6B9; --lav: #C9CEF5; --slate: #6B74A8;
+  --ink: #1A1530;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #07090F; color: var(--fg); font-family: 'Manrope', Arial, sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { margin: 0; font-family: 'Unbounded', Verdana, sans-serif; font-weight: 700; }
+p, ol, ul { margin: 0; }
+a { color: inherit; }
+.ico { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ---------- Сцена 1920×1080, масштабируется под окно ---------- */
+.viewport { position: fixed; inset: 0; }
+.stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform: translate(-50%, -50%) scale(var(--s, 0.5)); }
+.slide {
+  position: absolute; inset: 0; padding: 128px 128px 160px; display: flex; flex-direction: column; gap: 48px;
+  background: var(--bg); overflow: hidden; opacity: 0; visibility: hidden;
+  transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+}
+.slide.active { opacity: 1; visibility: visible; transition: opacity 0.6s ease; }
+.slide.alt { background: var(--bg2); }
+.rv { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(.2, .7, .2, 1); transition-delay: var(--d, 0ms); }
+.slide.active .rv { opacity: 1; transform: none; }
+
+h1 { font-size: 96px; line-height: 1.1; }
+h2 { font-size: 72px; line-height: 1.15; }
+h3 { font-size: 44px; font-weight: 600; line-height: 1.2; }
+.lead { font-size: 32px; line-height: 1.4; color: var(--muted); }
+.eyebrow { font-size: 32px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--a2); }
+.foot { position: absolute; left: 128px; bottom: 64px; font-size: 24px; color: var(--dim); }
+.badge { position: absolute; right: 128px; bottom: 54px; display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-radius: 999px; background: var(--card); border: 1px solid #3A4280; font-size: 24px; color: var(--lav); }
+.badge .ico { font-size: 28px; color: var(--a2); fill: var(--a2); stroke: none; animation: twinkle 2.4s ease-in-out infinite; }
+@keyframes twinkle { 50% { transform: rotate(72deg) scale(1.15); } }
+
+/* ---------- 1. Обложка ---------- */
+.s-cover { justify-content: center; gap: 40px; }
+.orbs, .stars { position: absolute; inset: 0; pointer-events: none; }
+.orb { position: absolute; border-radius: 50%; filter: blur(90px); animation: drift 18s ease-in-out infinite alternate; }
+.orb.a { width: 760px; height: 760px; background: #4B5BDB; left: 58%; top: -12%; opacity: 0.55; }
+.orb.b { width: 620px; height: 620px; background: #FF9A4D; left: 72%; top: 48%; opacity: 0.35; animation-duration: 23s; }
+.orb.c { width: 520px; height: 520px; background: #8B97FF; left: 40%; top: 66%; opacity: 0.25; animation-duration: 27s; }
+@keyframes drift { 50% { transform: translate(-140px, 90px) scale(1.15); } 100% { transform: translate(70px, -60px) scale(0.9); } }
+.star { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: var(--fg); animation: blink 4s ease-in-out infinite; }
+@keyframes blink { 0%, 100% { opacity: 0.1; } 50% { opacity: 0.9; } }
+.cover-body { position: relative; max-width: 1320px; display: flex; flex-direction: column; gap: 40px; }
+.grad { background: linear-gradient(90deg, var(--a2), var(--a1), var(--a2)); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shift 6s linear infinite; }
+@keyframes shift { to { background-position: -200% 0; } }
+
+/* ---------- 2. Боль ---------- */
+.pain { display: flex; align-items: center; gap: 96px; }
+.donut { position: relative; width: 520px; height: 520px; flex: none; }
+.donut svg { width: 520px; height: 520px; transform: rotate(-90deg); }
+.seg { fill: none; stroke-width: 64; transition: opacity 0.3s, stroke-width 0.3s; cursor: pointer; }
+.slide.active .seg { animation: draw 1.4s cubic-bezier(.3, .7, .2, 1) both; animation-delay: var(--d, 0ms); }
+@keyframes draw { from { stroke-dasharray: 0 1256.6; } }
+.pain.hov .seg:not(.hl) { opacity: 0.25; }
+.seg.hl { stroke-width: 76; }
+.donut-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; }
+.donut-label b { font-family: 'Unbounded', Verdana, sans-serif; font-size: 96px; line-height: 1.1; }
+.donut-label span { font-size: 24px; color: var(--muted); max-width: 300px; }
+.legend { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.lg { display: flex; align-items: center; gap: 20px; padding: 8px 16px; border-radius: 14px; font-size: 32px; cursor: pointer; transition: background 0.25s; }
+.lg.hl { background: var(--card); }
+.lg .sw { width: 28px; height: 28px; border-radius: 8px; flex: none; }
+.lg b { margin-left: auto; white-space: nowrap; }
+.pain-note { margin-top: 16px; padding-top: 24px; border-top: 1px solid var(--line2); }
+
+/* ---------- 3. До / после ---------- */
+.ba { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+.card { display: flex; flex-direction: column; gap: 24px; padding: 40px; border-radius: 24px; background: var(--bg2); border: 1px solid var(--line2); min-height: 0; }
+.card.ai { background: var(--card); border: 2px solid var(--a1); box-shadow: 0 0 80px -20px rgba(139, 151, 255, 0.45); }
+.card h3.muted { color: var(--muted); }
+.card ol { font-size: 32px; line-height: 1.4; padding-left: 44px; display: flex; flex-direction: column; gap: 8px; }
+.card .res { margin-top: auto; font-size: 32px; font-weight: 700; }
+.chat { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+.msg { max-width: 560px; padding: 14px 20px; border-radius: 22px; font-size: 24px; line-height: 1.35; transition: opacity 0.4s, transform 0.4s; }
+.msg.hide { opacity: 0; transform: translateY(14px); }
+.msg.u { align-self: flex-start; background: #2A3152; border-bottom-left-radius: 6px; }
+.msg.b { align-self: flex-end; background: var(--a1); color: var(--bg); border-bottom-right-radius: 6px; }
+.msg.ts { padding: 0; font-size: 24px; color: var(--muted); }
+.typing { align-self: flex-end; display: none; gap: 6px; padding: 18px 22px; border-radius: 22px; background: var(--a1); }
+.typing.on { display: flex; }
+.typing i { width: 10px; height: 10px; border-radius: 50%; background: var(--bg); animation: dot 1s infinite; }
+.typing i:nth-child(2) { animation-delay: 0.2s; } .typing i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dot { 50% { opacity: 0.25; transform: translateY(-4px); } }
+
+/* ---------- 4. Что можно отдать AI ---------- */
+.s-auto { padding-bottom: 128px; }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.tile { display: flex; flex-direction: column; gap: 16px; padding: 40px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); transition: transform 0.35s cubic-bezier(.2, .7, .2, 1), border-color 0.3s, box-shadow 0.3s, opacity 0.7s; }
+.tile:hover { transform: translateY(-10px); border-color: var(--a1); box-shadow: 0 24px 60px -20px rgba(139, 151, 255, 0.5); }
+.tile .ico { font-size: 48px; transition: transform 0.5s; }
+.tile:hover .ico { transform: rotate(-12deg) scale(1.15); }
+.tile h3 { font-size: 32px; }
+.tile p { font-size: 24px; line-height: 1.4; color: var(--muted); }
+
+/* ---------- 5. Калькулятор ---------- */
+.formula { display: flex; align-items: flex-start; gap: 28px; }
+.formula .op { font-family: 'Unbounded', Verdana, sans-serif; font-size: 72px; line-height: 1.1; color: var(--slate); }
+.fv { display: flex; flex-direction: column; gap: 8px; }
+.fv b { font-family: 'Unbounded', Verdana, sans-serif; font-size: 72px; line-height: 1.1; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fv span { font-size: 24px; color: var(--muted); }
+.fv.total b { color: var(--a2); }
+.calc-box { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1.4fr; gap: 48px; align-items: center; padding: 48px; border-radius: 28px; background: linear-gradient(120deg, #1B2140, #24193A); border: 1px solid #3A4280; }
+.sliders { display: flex; flex-direction: column; gap: 40px; }
+.sl label { display: flex; justify-content: space-between; gap: 16px; font-size: 28px; color: var(--muted); margin-bottom: 18px; }
+.sl label b { color: var(--fg); white-space: nowrap; }
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 12px; border-radius: 999px; background: linear-gradient(90deg, var(--a2) var(--p, 50%), #2C3360 var(--p, 50%)); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 40px; height: 40px; border-radius: 50%; background: var(--fg); border: 6px solid var(--a2); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4); }
+input[type=range]::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--fg); border: 6px solid var(--a2); }
+input[type=range]:focus-visible { box-shadow: 0 0 0 4px rgba(255, 184, 107, 0.35); }
+.year .l { font-size: 32px; color: var(--muted); }
+.year .n { font-size: 112px; font-weight: 800; line-height: 1.1; letter-spacing: -2px; color: var(--a2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.year .s { font-size: 28px; color: var(--lav); }
+
+/* ---------- 6. Как я работаю ---------- */
+.s-proc { padding-bottom: 128px; }
+.steps { display: flex; align-items: center; gap: 24px; }
+.step { flex: 1; min-height: 400px; display: flex; flex-direction: column; gap: 16px; padding: 40px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); position: relative; }
+.step .num { font-size: 24px; font-weight: 700; letter-spacing: 3px; color: var(--a1); }
+.step p.t { font-size: 32px; line-height: 1.4; color: var(--muted); }
+.arrow { font-size: 56px; color: var(--slate); }
+.secret { border: 2px dashed var(--a2); cursor: help; }
+.secret .num { color: var(--a2); }
+.secret .blur { filter: blur(12px); opacity: 0.6; transition: filter 0.6s; }
+.secret:hover .blur { filter: blur(9px); }
+.lock { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; color: var(--a2); }
+.lock .ico { font-size: 72px; }
+.secret:hover .lock .ico { animation: wiggle 0.5s ease 2; }
+@keyframes wiggle { 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); } }
+.lock b { font-size: 32px; }
+.lock small { font-size: 24px; color: var(--lav); opacity: 0; transform: translateY(8px); transition: 0.3s; }
+.secret:hover .lock small { opacity: 1; transform: none; }
+.pill { font-size: 32px; line-height: 1.4; padding: 16px 40px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); }
+
+/* ---------- 7. Оффер ---------- */
+.s-offer { background: var(--a2); color: var(--ink); justify-content: center; gap: 28px; padding-bottom: 128px; }
+.s-offer .eyebrow { color: #4A2A08; letter-spacing: 3px; }
+.s-offer .lead { color: #3A2A10; }
+.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; font-size: 32px; }
+.checks div { display: flex; align-items: center; gap: 16px; }
+.checks .ico { font-size: 36px; stroke-width: 3; }
+.cta { display: flex; align-items: center; gap: 24px; margin-top: 12px; }
+.btn-tg, .btn-wa { display: inline-flex; align-items: center; gap: 16px; font-weight: 800; text-decoration: none; border-radius: 999px; transition: transform 0.2s, box-shadow 0.2s; }
+.btn-tg { position: relative; overflow: hidden; padding: 28px 52px; font-size: 36px; background: var(--ink); color: var(--a2); box-shadow: 0 16px 40px -12px rgba(26, 21, 48, 0.6); }
+.btn-tg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.25) 50%, transparent 70%); transform: translateX(-100%); animation: shine 3.2s ease-in-out infinite; }
+@keyframes shine { 60%, 100% { transform: translateX(100%); } }
+.btn-wa { padding: 18px 32px; font-size: 26px; border: 2px solid var(--ink); color: var(--ink); }
+.btn-tg:hover, .btn-wa:hover { transform: translateY(-4px); }
+.cta-note { font-size: 26px; color: #3A2A10; }
+
+/* ---------- Управление ---------- */
+.progress { position: fixed; left: 0; top: 0; height: 3px; width: calc(var(--prog, 0) * 100%); background: linear-gradient(90deg, var(--a1), var(--a2)); transition: width 0.5s ease; z-index: 20; }
+.ui { position: fixed; z-index: 10; display: flex; align-items: center; gap: 8px; transition: opacity 0.4s; }
+.ui-top { top: 14px; left: 16px; right: 16px; justify-content: space-between; pointer-events: none; }
+.ui-top > * { pointer-events: auto; }
+.ui-bottom { bottom: 14px; left: 50%; transform: translateX(-50%); }
+.idle .ui, .idle .progress { opacity: 0; }
+.ub { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: rgba(21, 26, 44, 0.72); backdrop-filter: blur(10px); color: var(--fg); font: 600 14px 'Manrope', Arial, sans-serif; text-decoration: none; cursor: pointer; }
+.ub:hover { border-color: var(--a1); }
+.ub .ico { font-size: 18px; }
+.ub:focus-visible, .dot:focus-visible { outline: 2px solid var(--a2); outline-offset: 2px; }
+.dots { display: flex; gap: 6px; padding: 0 6px; }
+.dot { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: var(--slate); cursor: pointer; transition: width 0.3s, background 0.3s; }
+.dot.on { width: 26px; border-radius: 999px; background: var(--a2); }
+.count { min-width: 44px; text-align: center; font: 600 14px 'Manrope', Arial, sans-serif; color: var(--muted); }
+.dl { position: relative; }
+.dl-menu { position: absolute; right: 0; top: 48px; min-width: 230px; padding: 6px; border-radius: 14px; border: 1px solid var(--line); background: rgba(21, 26, 44, 0.96); backdrop-filter: blur(10px); display: none; }
+.dl.open .dl-menu { display: block; }
+.dl-menu a { display: flex; flex-direction: column; padding: 10px 12px; border-radius: 10px; text-decoration: none; font: 600 14px 'Manrope', Arial, sans-serif; }
+.dl-menu a small { color: var(--muted); font-weight: 500; }
+.dl-menu a:hover { background: var(--card); }
+.hint { position: fixed; left: 50%; bottom: 70px; transform: translateX(-50%); padding: 8px 14px; border-radius: 999px; background: rgba(21, 26, 44, 0.85); color: var(--muted); font: 13px 'Manrope', Arial, sans-serif; transition: opacity 0.6s; pointer-events: none; z-index: 10; }
+.hint.gone { opacity: 0; }
+.rotate { display: none; }
+@media (orientation: portrait) and (max-width: 700px) {
+  .rotate { display: block; position: fixed; left: 16px; right: 16px; bottom: 70px; text-align: center; color: var(--muted); font: 14px 'Manrope', Arial, sans-serif; z-index: 10; }
+  .hint { display: none; }
+}
+@media (max-width: 520px) { .ub .lbl { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
+}
+
+/* ---------- Статичный кадр (?static) и печать в PDF: всё в финальном состоянии ---------- */
+.static .ui, .static .progress, .static .hint, .static .rotate { display: none !important; }
+.static *, .static *::before, .static *::after { transition: none !important; }
+.static .rv, .static .msg.hide { opacity: 1 !important; transform: none !important; }
+.static .typing { display: none !important; }
+@page { size: 1920px 1080px; margin: 0; }
+@media print {
+  html, body { overflow: visible; height: auto; background: var(--bg); }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .ui, .progress, .hint, .rotate { display: none !important; }
+  .viewport { position: static; }
+  .stage { position: static; transform: none; width: 1920px; height: auto; }
+  .slide { position: relative; width: 1920px; height: 1080px; opacity: 1; visibility: visible; break-after: page; page-break-after: always; }
+  .rv, .msg.hide { opacity: 1 !important; transform: none !important; }
+  .typing { display: none !important; }
+  .orb { filter: blur(70px); }
+  /* background-clip:text в PDF даёт рамки вокруг строк — в печати сплошной цвет */
+  .grad { background: none; color: var(--a2); }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.2-6.2 3.2L7 14.2 2 9.3l6.9-1Z"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+  <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+</svg>
+
+<div class="progress" aria-hidden="true"></div>
+
+<div class="viewport">
+<main class="stage" id="stage">
+
+<!-- 1. Обложка -->
+<section class="slide s-cover" aria-label="Слайд 1 из 7: обложка">
+  <div class="orbs" aria-hidden="true"><i class="orb a"></i><i class="orb b"></i><i class="orb c"></i></div>
+  <div class="stars" id="stars" aria-hidden="true"></div>
+  <div class="cover-body">
+    <p class="eyebrow rv">AI-автоматизация для малого бизнеса</p>
+    <h1 class="rv" style="--d:120ms">Ваш бизнес может работать, <span class="grad">пока вы&nbsp;спите</span></h1>
+    <p class="lead rv" style="--d:260ms">Как перестать тратить вечера на рутину и вернуть себе время на то, что приносит деньги</p>
+  </div>
+  <p class="foot rv" style="--d:500ms;color:var(--muted)">Promptly · t.me/nothing8931</p>
+  <p class="badge rv" style="--d:700ms"><svg class="ico"><use href="#i-star"/></svg>Такой эффект сделаю и в вашей презентации</p>
+</section>
+
+<!-- 2. Боль -->
+<section class="slide" aria-label="Слайд 2 из 7: куда уходит ваш день">
+  <h2 class="rv">Куда уходит ваш день</h2>
+  <div class="pain" id="pain">
+    <div class="donut rv" style="--d:120ms">
+      <svg viewBox="0 0 520 520" role="img" aria-label="Кольцевая диаграмма: из 6 часов рутины 2 часа — переписка, 1,5 — заявки, по 1 — отчёты и контент, 0,5 — напоминания">
+        <circle cx="260" cy="260" r="200" fill="none" stroke="#262C45" stroke-width="64"/>
+        <circle class="seg" data-k="0" style="--d:200ms" cx="260" cy="260" r="200" stroke="#FFB86B" stroke-dasharray="412.9 1256.6" stroke-dashoffset="0"/>
+        <circle class="seg" data-k="1" style="--d:350ms" cx="260" cy="260" r="200" stroke="#8B97FF" stroke-dasharray="308.2 1256.6" stroke-dashoffset="-418.9"/>
+        <circle class="seg" data-k="2" style="--d:500ms" cx="260" cy="260" r="200" stroke="#4BC6B9" stroke-dasharray="203.4 1256.6" stroke-dashoffset="-733.1"/>
+        <circle class="seg" data-k="3" style="--d:650ms" cx="260" cy="260" r="200" stroke="#C9CEF5" stroke-dasharray="203.4 1256.6" stroke-dashoffset="-942.5"/>
+        <circle class="seg" data-k="4" style="--d:800ms" cx="260" cy="260" r="200" stroke="#6B74A8" stroke-dasharray="98.7 1256.6" stroke-dashoffset="-1151.9"/>
+      </svg>
+      <div class="donut-label" aria-hidden="true"><b id="dl-v">6 ч</b><span id="dl-t">рутины каждый день</span></div>
+    </div>
+    <div class="legend">
+      <div class="lg rv" data-k="0" style="--d:200ms"><i class="sw" style="background:#FFB86B"></i><span>Переписка с клиентами</span><b>2 ч</b></div>
+      <div class="lg rv" data-k="1" style="--d:280ms"><i class="sw" style="background:#8B97FF"></i><span>Приём и обработка заявок</span><b>1,5 ч</b></div>
+      <div class="lg rv" data-k="2" style="--d:360ms"><i class="sw" style="background:#4BC6B9"></i><span>Отчёты и таблицы</span><b>1 ч</b></div>
+      <div class="lg rv" data-k="3" style="--d:440ms"><i class="sw" style="background:#C9CEF5"></i><span>Посты и контент</span><b>1 ч</b></div>
+      <div class="lg rv" data-k="4" style="--d:520ms"><i class="sw" style="background:#6B74A8"></i><span>Напоминания и записи</span><b>0,5 ч</b></div>
+      <p class="lead pain-note rv" style="--d:640ms">Многое из этого можно <span style="color:var(--a2)">отдать AI</span>, а время потратить на клиентов и отдых</p>
+    </div>
+  </div>
+  <p class="foot">Пример типичного дня владельца. Наведите на диаграмму · у вас цифры будут свои</p>
+  <p class="badge"><svg class="ico"><use href="#i-star"/></svg>Такой эффект сделаю и в вашей презентации</p>
+</section>
+
+<!-- 3. До / после -->
+<section class="slide" aria-label="Слайд 3 из 7: одна заявка до и после">
+  <h2 class="rv">Одна заявка: до и после</h2>
+  <div class="ba">
+    <div class="card rv" style="--d:120ms">
+      <h3 class="muted">Вручную</h3>
+      <ol>
+        <li>Увидеть сообщение, если не спите</li>
+        <li>Ответить на вопросы о ценах</li>
+        <li>Уточнить удобное время</li>
+        <li>Записать в таблицу или тетрадь</li>
+        <li>Напомнить клиенту накануне</li>
+      </ol>
+      <p class="res" style="color:var(--a2)">Пример: ≈ 40 минут на заявку</p>
+    </div>
+    <div class="card ai rv" style="--d:260ms">
+      <h3>С AI</h3>
+      <div class="chat" id="chat" aria-live="off">
+        <p class="msg ts">03:14 · новое сообщение</p>
+        <p class="msg u">Здравствуйте! Сколько стоит стрижка? Есть запись на завтра?</p>
+        <p class="msg b">Доброй ночи! Стрижка от 1 500 ₽. Завтра свободно 11:00 и 15:30. Записать вас?</p>
+        <p class="msg u">Давайте на 15:30</p>
+        <p class="msg b">Готово! Напомню за 2 часа до визита</p>
+        <div class="typing" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+      <p class="res" style="color:var(--a1)">≈ 1 минута, даже в 3 часа ночи</p>
+    </div>
+  </div>
+  <p class="foot">Условный пример салона красоты. Цифры у каждого свои</p>
+  <p class="badge"><svg class="ico"><use href="#i-star"/></svg>Такой эффект сделаю и в вашей презентации</p>
+</section>
+
+<!-- 4. Что можно отдать AI -->
+<section class="slide alt s-auto" aria-label="Слайд 4 из 7: что можно отдать AI">
+  <h2 class="rv">Что можно отдать AI уже сейчас</h2>
+  <div class="tiles">
+    <div class="tile rv" style="--d:100ms"><svg class="ico" style="color:var(--a2)"><use href="#i-chat"/></svg><h3>Ответы клиентам 24/7</h3><p>Ответ приходит сразу, даже ночью и в выходные</p></div>
+    <div class="tile rv" style="--d:180ms"><svg class="ico" style="color:var(--a1)"><use href="#i-send"/></svg><h3>Приём заявок</h3><p>Все заявки собираются в одном месте</p></div>
+    <div class="tile rv" style="--d:260ms"><svg class="ico" style="color:var(--teal)"><use href="#i-clock"/></svg><h3>Напоминания и записи</h3><p>Клиенты получают напоминания сами, без ваших звонков</p></div>
+    <div class="tile rv" style="--d:340ms"><svg class="ico" style="color:var(--a2)"><use href="#i-bulb"/></svg><h3>Контент для соцсетей</h3><p>Идеи и черновики постов на месяц вперёд</p></div>
+    <div class="tile rv" style="--d:420ms"><svg class="ico" style="color:var(--a1)"><use href="#i-chart"/></svg><h3>Отчёты</h3><p>Цифры бизнеса без ручных таблиц</p></div>
+    <div class="tile rv" style="--d:500ms"><svg class="ico" style="color:var(--teal)"><use href="#i-doc"/></svg><h3>Документы</h3><p>Договоры и коммерческие предложения по шаблону</p></div>
+  </div>
+</section>
+
+<!-- 5. Калькулятор -->
+<section class="slide" aria-label="Слайд 5 из 7: калькулятор стоимости рутины">
+  <h2 class="rv">Сколько стоит ваша рутина</h2>
+  <div class="formula rv" style="--d:120ms" aria-live="polite">
+    <div class="fv"><b id="f-h">6 ч</b><span>рутины в день</span></div>
+    <p class="op">×</p>
+    <div class="fv"><b id="f-r">1 000 ₽</b><span>ваш час</span></div>
+    <p class="op">×</p>
+    <div class="fv"><b>22</b><span>рабочих дня</span></div>
+    <p class="op">=</p>
+    <div class="fv total"><b id="f-m">132 000 ₽</b><span>в месяц</span></div>
+  </div>
+  <div class="calc-box rv" style="--d:260ms">
+    <div class="sliders">
+      <div class="sl"><label for="in-h">Часов рутины в день <b id="o-h">6</b></label><input id="in-h" type="range" min="1" max="10" step="0.5" value="6"></div>
+      <div class="sl"><label for="in-r">Стоимость вашего часа <b id="o-r">1 000 ₽</b></label><input id="in-r" type="range" min="300" max="5000" step="100" value="1000"></div>
+    </div>
+    <div class="year">
+      <p class="l">Столько за год стоит ручная рутина</p>
+      <p class="n" id="f-y">1 584 000 ₽</p>
+      <p class="s">Даже часть этой суммы — серьёзные деньги</p>
+    </div>
+  </div>
+  <p class="foot">Пример по умолчанию: 6 ч × 1 000 ₽ × 22 дня × 12 месяцев. Подвигайте ползунки</p>
+  <p class="badge"><svg class="ico"><use href="#i-star"/></svg>Такой эффект сделаю и в вашей презентации</p>
+</section>
+
+<!-- 6. Как я работаю -->
+<section class="slide alt s-proc" aria-label="Слайд 6 из 7: как я работаю">
+  <h2 class="rv">Как я работаю</h2>
+  <div class="steps">
+    <div class="step rv" style="--d:100ms"><p class="num">01</p><h3>Бриф</h3><p class="t">Рассказываете о бизнесе и о том, кому будете показывать презентацию</p></div>
+    <svg class="ico arrow rv" style="--d:180ms"><use href="#i-arrow"/></svg>
+    <div class="step secret rv" style="--d:260ms" tabindex="0" aria-label="Шаг 2 скрыт: секретный ингредиент">
+      <p class="num">02</p>
+      <h3 class="blur" aria-hidden="true">Сборка</h3>
+      <p class="t blur" aria-hidden="true">Здесь всё самое интересное, но это останется между нами</p>
+      <div class="lock"><svg class="ico"><use href="#i-lock"/></svg><b>Секретный ингредиент</b><small>Показываю только результат</small></div>
+    </div>
+    <svg class="ico arrow rv" style="--d:340ms"><use href="#i-arrow"/></svg>
+    <div class="step rv" style="--d:420ms"><p class="num">03</p><h3>Результат</h3><p class="t">Готовая презентация: ссылка для показа, PDF и PowerPoint</p></div>
+  </div>
+  <p class="pill rv" style="--d:520ms">Срок и цену обсудим лично. Шаг 2 не показываю: это моя работа, вам — результат</p>
+</section>
+
+<!-- 7. Оффер -->
+<section class="slide s-offer" aria-label="Слайд 7 из 7: предложение и контакты">
+  <p class="eyebrow rv">P.S. Всё, что вы видели, — пример моей работы</p>
+  <h1 class="rv" style="--d:120ms">Хотите такую же презентацию про ваш бизнес?</h1>
+  <p class="lead rv" style="--d:220ms">Я делаю презентации, которые понятно объясняют ваш продукт или услугу и помогают продавать</p>
+  <div class="checks rv" style="--d:320ms">
+    <div><svg class="ico"><use href="#i-check"/></svg>Живые анимации и эффекты</div>
+    <div><svg class="ico"><use href="#i-check"/></svg>Ссылка для отправки клиенту</div>
+    <div><svg class="ico"><use href="#i-check"/></svg>PDF и PowerPoint в комплекте</div>
+    <div><svg class="ico"><use href="#i-check"/></svg>Текст, который продаёт</div>
+  </div>
+  <div class="cta rv" style="--d:420ms">
+    <a class="btn-tg" href="https://t.me/nothing8931?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BF%D1%80%D0%B5%D0%B7%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8E%20%D0%BF%D1%80%D0%BE%20%D1%81%D0%B2%D0%BE%D0%B9%20%D0%B1%D0%B8%D0%B7%D0%BD%D0%B5%D1%81" target="_blank" rel="noopener"><svg class="ico"><use href="#i-send"/></svg>Telegram: @nothing8931</a>
+    <a class="btn-wa" href="https://wa.me/79679306331" target="_blank" rel="noopener"><svg class="ico"><use href="#i-chat"/></svg>WhatsApp: +7 967 930-63-31</a>
+    <p class="cta-note">Отвечу в течение дня</p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<div class="ui ui-top">
+  <a class="ub" href="https://promtly-ru.github.io/#works"><svg class="ico"><use href="#i-left"/></svg><span class="lbl">Promptly</span></a>
+  <div style="display:flex;gap:8px">
+    <div class="dl" id="dl">
+      <button class="ub" type="button" aria-haspopup="true" aria-expanded="false" id="dl-btn"><svg class="ico"><use href="#i-down"/></svg><span class="lbl">Скачать</span></button>
+      <div class="dl-menu" role="menu">
+        <a role="menuitem" href="downloads/promptly-ai-presentation.pdf" download>PDF <small>для печати и отправки</small></a>
+        <a role="menuitem" href="downloads/promptly-ai-presentation.pptx" download>PowerPoint <small>.pptx, слайды-изображения</small></a>
+      </div>
+    </div>
+    <button class="ub" type="button" id="fs" aria-label="Во весь экран (F)" title="Во весь экран (F)"><svg class="ico"><use href="#i-full"/></svg></button>
+  </div>
+</div>
+<nav class="ui ui-bottom" aria-label="Навигация по слайдам">
+  <button class="ub" type="button" id="prev" aria-label="Предыдущий слайд"><svg class="ico"><use href="#i-left"/></svg></button>
+  <div class="dots" id="dots"></div>
+  <span class="count" id="count">1 / 7</span>
+  <button class="ub" type="button" id="next" aria-label="Следующий слайд"><svg class="ico"><use href="#i-right"/></svg></button>
+</nav>
+<p class="hint" id="hint">← → , колесо или свайп · F — во весь экран</p>
+<p class="rotate">Поверните телефон горизонтально — так удобнее</p>
+
+<script>
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var params = new URLSearchParams(location.search);
+  var STATIC = params.has('static');
+  if (STATIC) root.classList.add('static');
+
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsEl = document.getElementById('dots');
+  var countEl = document.getElementById('count');
+  var cur = -1;
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.setProperty('--s', s);
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  slides.forEach(function (_, i) {
+    var b = document.createElement('button');
+    b.className = 'dot';
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Слайд ' + (i + 1));
+    b.addEventListener('click', function () { go(i); });
+    dotsEl.appendChild(b);
+  });
+  var dots = dotsEl.children;
+
+  function go(i) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    if (i === cur) return;
+    if (cur >= 0) { slides[cur].classList.remove('active'); leave(cur); }
+    cur = i;
+    slides[i].classList.add('active');
+    for (var k = 0; k < dots.length; k++) dots[k].classList.toggle('on', k === i);
+    countEl.textContent = (i + 1) + ' / ' + slides.length;
+    root.style.setProperty('--prog', (i + 1) / slides.length);
+    if (!STATIC) history.replaceState(null, '', '#' + (i + 1));
+    enter(i);
+  }
+
+  // ---------- Звёзды на обложке ----------
+  var stars = document.getElementById('stars');
+  for (var n = 0; n < 70; n++) {
+    var st = document.createElement('i');
+    st.className = 'star';
+    st.style.left = (Math.random() * 100) + '%';
+    st.style.top = (Math.random() * 100) + '%';
+    st.style.animationDelay = (Math.random() * 4) + 's';
+    st.style.animationDuration = (3 + Math.random() * 4) + 's';
+    stars.appendChild(st);
+  }
+
+  // ---------- Диаграмма: подсветка сегмента и легенды ----------
+  var pain = document.getElementById('pain');
+  var DATA = [['2 ч', 'переписка с клиентами'], ['1,5 ч', 'приём и обработка заявок'], ['1 ч', 'отчёты и таблицы'], ['1 ч', 'посты и контент'], ['0,5 ч', 'напоминания и записи']];
+  var dlV = document.getElementById('dl-v');
+  var dlT = document.getElementById('dl-t');
+  function hl(k) {
+    pain.classList.toggle('hov', k !== null);
+    pain.querySelectorAll('[data-k]').forEach(function (el) { el.classList.toggle('hl', el.getAttribute('data-k') === String(k)); });
+    dlV.textContent = k === null ? '6 ч' : DATA[k][0];
+    dlT.textContent = k === null ? 'рутины каждый день' : DATA[k][1];
+  }
+  pain.querySelectorAll('[data-k]').forEach(function (el) {
+    el.addEventListener('pointerenter', function () { hl(Number(el.getAttribute('data-k'))); });
+    el.addEventListener('pointerleave', function () { hl(null); });
+  });
+
+  // ---------- Чат: сообщения появляются по очереди ----------
+  var chat = document.getElementById('chat');
+  var msgs = Array.prototype.slice.call(chat.querySelectorAll('.msg'));
+  var typing = chat.querySelector('.typing');
+  var chatRun = 0;
+  function playChat() {
+    var run = ++chatRun;
+    msgs.forEach(function (m) { m.classList.add('hide'); });
+    typing.classList.remove('on');
+    var i = 0;
+    function wait(ms, fn) { setTimeout(function () { if (run === chatRun) fn(); }, ms); }
+    function next() {
+      if (i >= msgs.length) { wait(4500, playChat); return; }
+      var m = msgs[i++];
+      if (m.classList.contains('b')) {
+        chat.insertBefore(typing, m);
+        typing.classList.add('on');
+        wait(1000, function () { typing.classList.remove('on'); m.classList.remove('hide'); wait(1200, next); });
+      } else {
+        m.classList.remove('hide');
+        wait(1200, next);
+      }
+    }
+    wait(700, next);
+  }
+  function stopChat() {
+    chatRun++;
+    typing.classList.remove('on');
+    msgs.forEach(function (m) { m.classList.remove('hide'); });
+  }
+
+  // ---------- Калькулятор ----------
+  var inH = document.getElementById('in-h');
+  var inR = document.getElementById('in-r');
+  var fY = document.getElementById('f-y');
+  function rub(v) { return Math.round(v).toLocaleString('ru-RU') + ' ₽'; }
+  function hours(v) { return String(v).replace('.', ',') + ' ч'; }
+  function fill(inp) { inp.style.setProperty('--p', ((inp.value - inp.min) / (inp.max - inp.min) * 100) + '%'); }
+  function yearly() { return Number(inH.value) * Number(inR.value) * 22 * 12; }
+  function calc(animateYear) {
+    var h = Number(inH.value);
+    var r = Number(inR.value);
+    document.getElementById('f-h').textContent = hours(h);
+    document.getElementById('o-h').textContent = String(h).replace('.', ',');
+    document.getElementById('f-r').textContent = rub(r);
+    document.getElementById('o-r').textContent = rub(r);
+    document.getElementById('f-m').textContent = rub(h * r * 22);
+    fill(inH); fill(inR);
+    if (!animateYear) fY.textContent = rub(yearly());
+  }
+  var countRun = 0;
+  function countUp() {
+    var run = ++countRun;
+    var target = yearly();
+    var t0 = null;
+    function step(ts) {
+      if (run !== countRun) return;
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / 2000);
+      var e = 1 - Math.pow(1 - p, 3);
+      fY.textContent = rub(Math.round(target * e / 1000) * 1000);
+      if (p < 1) requestAnimationFrame(step); else fY.textContent = rub(target);
+    }
+    requestAnimationFrame(step);
+  }
+  [inH, inR].forEach(function (inp) {
+    inp.addEventListener('input', function () { countRun++; calc(false); });
+    // Стрелки на ползунке не должны листать слайды
+    inp.addEventListener('keydown', function (e) { e.stopPropagation(); });
+  });
+  calc(false);
+
+  function enter(i) {
+    if (STATIC) return;
+    if (i === 2) playChat();
+    if (i === 4) countUp();
+  }
+  function leave(i) {
+    if (i === 2) stopChat();
+    if (i === 4) { countRun++; calc(false); }
+  }
+
+  // ---------- Навигация ----------
+  document.getElementById('prev').addEventListener('click', function () { go(cur - 1); });
+  document.getElementById('next').addEventListener('click', function () { go(cur + 1); });
+  document.addEventListener('keydown', function (e) {
+    if (e.target.closest && e.target.closest('input, textarea')) return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter' && e.target === document.body) { e.preventDefault(); go(cur + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(cur - 1); }
+    else if (k === 'Home') go(0);
+    else if (k === 'End') go(slides.length - 1);
+    else if (k === 'f' || k === 'F' || k === 'а' || k === 'А') toggleFs();
+    else if (k === 'Escape') closeDl();
+  });
+  var wheelLock = 0;
+  window.addEventListener('wheel', function (e) {
+    if (e.target.closest && e.target.closest('input')) return;
+    var now = Date.now();
+    if (now < wheelLock || Math.abs(e.deltaY) < 20) return;
+    wheelLock = now + 900;
+    go(cur + (e.deltaY > 0 ? 1 : -1));
+  }, { passive: true });
+  var tx = null, ty = null;
+  window.addEventListener('touchstart', function (e) {
+    if (e.target.closest && e.target.closest('input, a, button')) { tx = null; return; }
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener('touchend', function (e) {
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx;
+    var dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(cur + (dx < 0 ? 1 : -1));
+    tx = null;
+  }, { passive: true });
+
+  function toggleFs() {
+    if (!document.fullscreenElement) { if (root.requestFullscreen) root.requestFullscreen().catch(function () {}); }
+    else if (document.exitFullscreen) document.exitFullscreen();
+  }
+  document.getElementById('fs').addEventListener('click', toggleFs);
+
+  var dl = document.getElementById('dl');
+  var dlBtn = document.getElementById('dl-btn');
+  function closeDl() { dl.classList.remove('open'); dlBtn.setAttribute('aria-expanded', 'false'); }
+  dlBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var open = !dl.classList.contains('open');
+    dl.classList.toggle('open', open);
+    dlBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', function (e) { if (!dl.contains(e.target)) closeDl(); });
+
+  // Панели прячутся, если мышь не двигается: смотреть презентацию ничего не мешает
+  var idleT = 0;
+  function wake() {
+    root.classList.remove('idle');
+    clearTimeout(idleT);
+    idleT = setTimeout(function () { if (!dl.classList.contains('open')) root.classList.add('idle'); }, 3000);
+  }
+  ['pointermove', 'keydown', 'touchstart'].forEach(function (ev) { window.addEventListener(ev, wake, { passive: true }); });
+  wake();
+
+  var hint = document.getElementById('hint');
+  setTimeout(function () { hint.classList.add('gone'); }, 4000);
+
+  var start = parseInt(location.hash.slice(1), 10);
+  go(isNaN(start) ? 0 : start - 1);
+})();
+</script>
+</body>
+</html>
