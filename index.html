@@ -20,7 +20,7 @@
   --ink: #1A1530;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: #07090F; color: var(--fg); font-family: 'Manrope', Arial, sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; }
+html, body { margin: 0; height: 100%; background: #07090F; color: var(--fg); font-family: 'Manrope', Arial, sans-serif; overflow: hidden; overscroll-behavior: none; -webkit-font-smoothing: antialiased; }
 h1, h2, h3 { margin: 0; font-family: 'Unbounded', Verdana, sans-serif; font-weight: 700; }
 p, ol, ul { margin: 0; }
 a { color: inherit; }
@@ -213,6 +213,7 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 4px rgba(255, 184, 107, 0.35
   .viewport { position: static; }
   .stage { position: static; transform: none; width: 1920px; height: auto; }
   .slide { position: relative; width: 1920px; height: 1080px; opacity: 1; visibility: visible; break-after: page; page-break-after: always; }
+  .slide:last-child { break-after: auto; page-break-after: auto; }
   .rv, .msg.hide { opacity: 1 !important; transform: none !important; }
   .typing { display: none !important; }
   .orb { filter: blur(70px); }
@@ -515,10 +516,10 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 4px rgba(255, 184, 107, 0.35
     }
     wait(700, next);
   }
+  // Сообщения не раскрываем при уходе: слайд ещё гаснет, а playChat всё равно скроет их заново
   function stopChat() {
     chatRun++;
     typing.classList.remove('on');
-    msgs.forEach(function (m) { m.classList.remove('hide'); });
   }
 
   // ---------- Калькулятор ----------
@@ -559,6 +560,8 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 4px rgba(255, 184, 107, 0.35
     inp.addEventListener('input', function () { countRun++; calc(false); });
     // Стрелки на ползунке не должны листать слайды
     inp.addEventListener('keydown', function (e) { e.stopPropagation(); });
+    // После перетаскивания мышью снимаем фокус, иначе стрелки так и будут двигать ползунок
+    inp.addEventListener('pointerup', function () { inp.blur(); });
   });
   calc(false);
 
@@ -576,8 +579,11 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 4px rgba(255, 184, 107, 0.35
   document.getElementById('prev').addEventListener('click', function () { go(cur - 1); });
   document.getElementById('next').addEventListener('click', function () { go(cur + 1); });
   document.addEventListener('keydown', function (e) {
+    // Ctrl/Cmd/Alt — сочетания браузера (поиск, «назад»), их не перехватываем
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.target.closest && e.target.closest('input, textarea')) return;
     var k = e.key;
+    if (e.repeat && k !== 'ArrowRight' && k !== 'ArrowLeft') return;
     if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter' && e.target === document.body) { e.preventDefault(); go(cur + 1); }
     else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(cur - 1); }
     else if (k === 'Home') go(0);
@@ -585,19 +591,31 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 4px rgba(255, 184, 107, 0.35
     else if (k === 'f' || k === 'F' || k === 'а' || k === 'А') toggleFs();
     else if (k === 'Escape') closeDl();
   });
-  var wheelLock = 0;
+  // Колесо и тачпад: дельта приводится к пикселям (Firefox шлёт строки), мелкие события копятся,
+  // а пока идёт инерция жеста, блокировка продлевается — один жест = один слайд
+  var wheelAcc = 0, wheelReset = 0, wheelLock = 0;
   window.addEventListener('wheel', function (e) {
+    if (e.ctrlKey) return; // pinch-zoom
     if (e.target.closest && e.target.closest('input')) return;
+    var k = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1;
+    var d = (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * k;
     var now = Date.now();
-    if (now < wheelLock || Math.abs(e.deltaY) < 20) return;
-    wheelLock = now + 900;
-    go(cur + (e.deltaY > 0 ? 1 : -1));
+    if (now < wheelLock) { wheelLock = now + 250; return; }
+    wheelAcc += d;
+    clearTimeout(wheelReset);
+    wheelReset = setTimeout(function () { wheelAcc = 0; }, 150);
+    if (Math.abs(wheelAcc) > 50) {
+      go(cur + (wheelAcc > 0 ? 1 : -1));
+      wheelAcc = 0;
+      wheelLock = now + 500;
+    }
   }, { passive: true });
   var tx = null, ty = null;
   window.addEventListener('touchstart', function (e) {
-    if (e.target.closest && e.target.closest('input, a, button')) { tx = null; return; }
+    if (e.touches.length > 1 || (e.target.closest && e.target.closest('input, a, button'))) { tx = null; return; }
     tx = e.touches[0].clientX; ty = e.touches[0].clientY;
   }, { passive: true });
+  window.addEventListener('touchcancel', function () { tx = null; }, { passive: true });
   window.addEventListener('touchend', function (e) {
     if (tx === null) return;
     var dx = e.changedTouches[0].clientX - tx;
@@ -636,8 +654,13 @@ input[type=range]:focus-visible { box-shadow: 0 0 0 4px rgba(255, 184, 107, 0.35
   var hint = document.getElementById('hint');
   setTimeout(function () { hint.classList.add('gone'); }, 4000);
 
-  var start = parseInt(location.hash.slice(1), 10);
-  go(isNaN(start) ? 0 : start - 1);
+  function fromHash() {
+    var n = parseInt(location.hash.slice(1), 10);
+    return isNaN(n) ? 0 : n - 1;
+  }
+  // Ссылка вида #5 на уже открытой странице тоже переключает слайд
+  window.addEventListener('hashchange', function () { go(fromHash()); });
+  go(fromHash());
 })();
 </script>
 </body>
